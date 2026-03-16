@@ -1,14 +1,13 @@
 import { useState } from "react";
 import {
-  Download,
   Shield,
   Zap,
-  Eye,
   Clock,
   ArrowRight,
   Hash,
   Users,
   Mic,
+  MicOff,
   Settings,
   Bell,
   Search,
@@ -17,13 +16,56 @@ import {
   BookOpen,
   GraduationCap,
   MessageSquare,
+  Volume2,
+  Crown,
+  Camera,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 
+const USERS_INITIAL = [
+  { name: "Катя из ИТ-23", status: "Решает алгоритмы", avatar: "К", color: "from-purple-500 to-pink-500", isAdmin: false },
+  { name: "Дима из МА-22", status: "В сети", avatar: "Д", color: "from-green-500 to-blue-500", isAdmin: false },
+  { name: "Настя ЭК-24", status: "Готовится к сессии", avatar: "Н", color: "from-yellow-500 to-orange-500", isAdmin: false },
+  { name: "Артём ИТ-23", status: "На паре", avatar: "А", color: "from-blue-500 to-purple-500", isAdmin: true },
+];
+
+const AVATAR_COLORS = [
+  "from-purple-500 to-pink-500",
+  "from-green-500 to-blue-500",
+  "from-yellow-500 to-orange-500",
+  "from-blue-500 to-purple-500",
+  "from-red-500 to-pink-500",
+  "from-teal-500 to-cyan-500",
+];
+
 const Index = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [usersOpen, setUsersOpen] = useState(false);
+  const [nickname, setNickname] = useState("Студент");
+  const [group, setGroup] = useState("ИТ-23");
+  const [volume, setVolume] = useState(80);
+  const [micMuted, setMicMuted] = useState(false);
+  const [avatarColor, setAvatarColor] = useState("from-blue-500 to-purple-500");
+  const [avatarLetter, setAvatarLetter] = useState("С");
+  const [users, setUsers] = useState(USERS_INITIAL);
+  const [settingsTab, setSettingsTab] = useState<"profile" | "sound" | "avatar">("profile");
+  const [savedNotice, setSavedNotice] = useState(false);
+
+  const handleSaveSettings = () => {
+    setSavedNotice(true);
+    setTimeout(() => setSavedNotice(false), 2000);
+    setSettingsOpen(false);
+  };
+
+  const toggleAdmin = (index: number) => {
+    setUsers((prev) =>
+      prev.map((u, i) => (i === index ? { ...u, isAdmin: !u.isAdmin } : u))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#36393f] text-white overflow-x-hidden">
@@ -141,18 +183,33 @@ const Index = () => {
               </div>
             </div>
             <div className="p-2 bg-[#292b2f] flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#5865f2] rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">С</span>
+              <div className={`w-8 h-8 bg-gradient-to-r ${avatarColor} rounded-full flex items-center justify-center flex-shrink-0`}>
+                <span className="text-white text-sm font-bold">{avatarLetter}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-white text-sm font-medium truncate">Студент</div>
-                <div className="text-[#b9bbbe] text-xs truncate">группа ИТ-23</div>
+                <div className="text-white text-sm font-medium truncate">{nickname}</div>
+                <div className="text-[#b9bbbe] text-xs truncate">группа {group}</div>
               </div>
               <div className="flex gap-1">
-                <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-[#40444b]">
-                  <Mic className="w-4 h-4 text-[#b9bbbe]" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-8 h-8 p-0 hover:bg-[#40444b]"
+                  onClick={() => setMicMuted(!micMuted)}
+                  title={micMuted ? "Включить микрофон" : "Выключить микрофон"}
+                >
+                  {micMuted
+                    ? <MicOff className="w-4 h-4 text-red-400" />
+                    : <Mic className="w-4 h-4 text-[#b9bbbe]" />
+                  }
                 </Button>
-                <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-[#40444b]">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-8 h-8 p-0 hover:bg-[#40444b]"
+                  onClick={() => setSettingsOpen(true)}
+                  title="Настройки"
+                >
                   <Settings className="w-4 h-4 text-[#b9bbbe]" />
                 </Button>
               </div>
@@ -176,7 +233,11 @@ const Index = () => {
               <span className="text-[#8e9297] text-sm hidden sm:block">Общайся, учись и помогай однокурсникам</span>
               <div className="ml-auto flex items-center gap-2 sm:gap-4">
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-[#b9bbbe] cursor-pointer hover:text-[#dcddde]" />
-                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[#b9bbbe] cursor-pointer hover:text-[#dcddde]" />
+                <Users
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-[#b9bbbe] cursor-pointer hover:text-[#dcddde]"
+                  onClick={() => setUsersOpen(true)}
+                  title="Управление участниками"
+                />
                 <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#b9bbbe] cursor-pointer hover:text-[#dcddde]" />
               </div>
             </div>
@@ -417,6 +478,204 @@ const Index = () => {
           </div>
         </div>
       </div>
+      {/* Модаль настроек */}
+      {settingsOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setSettingsOpen(false)}>
+          <div className="bg-[#2f3136] rounded-xl w-full max-w-lg shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[#202225]">
+              <h2 className="text-white text-lg font-bold">Настройки пользователя</h2>
+              <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-[#40444b]" onClick={() => setSettingsOpen(false)}>
+                <X className="w-4 h-4 text-[#b9bbbe]" />
+              </Button>
+            </div>
+
+            {/* Табы */}
+            <div className="flex border-b border-[#202225] px-6">
+              {(["profile", "sound", "avatar"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setSettingsTab(tab)}
+                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    settingsTab === tab
+                      ? "border-[#5865f2] text-white"
+                      : "border-transparent text-[#8e9297] hover:text-[#dcddde]"
+                  }`}
+                >
+                  {tab === "profile" ? "Профиль" : tab === "sound" ? "Звук" : "Аватарка"}
+                </button>
+              ))}
+            </div>
+
+            <div className="p-6">
+              {settingsTab === "profile" && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[#b9bbbe] text-xs font-semibold uppercase tracking-wide block mb-2">Никнейм</label>
+                    <input
+                      className="w-full bg-[#202225] text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#5865f2] border border-[#40444b]"
+                      value={nickname}
+                      onChange={(e) => setNickname(e.target.value)}
+                      maxLength={32}
+                      placeholder="Введи никнейм..."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#b9bbbe] text-xs font-semibold uppercase tracking-wide block mb-2">Группа</label>
+                    <input
+                      className="w-full bg-[#202225] text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#5865f2] border border-[#40444b]"
+                      value={group}
+                      onChange={(e) => setGroup(e.target.value)}
+                      maxLength={16}
+                      placeholder="Например: ИТ-23"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#b9bbbe] text-xs font-semibold uppercase tracking-wide block mb-2">Буква на аватарке</label>
+                    <input
+                      className="w-full bg-[#202225] text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#5865f2] border border-[#40444b]"
+                      value={avatarLetter}
+                      onChange={(e) => setAvatarLetter(e.target.value.slice(0, 1).toUpperCase() || "С")}
+                      maxLength={1}
+                      placeholder="С"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "sound" && (
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="text-[#b9bbbe] text-xs font-semibold uppercase tracking-wide flex items-center gap-2">
+                        <Volume2 className="w-4 h-4" /> Громкость звука
+                      </label>
+                      <span className="text-white text-sm font-bold">{volume}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={volume}
+                      onChange={(e) => setVolume(Number(e.target.value))}
+                      className="w-full accent-[#5865f2] cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[#72767d] text-xs mt-1">
+                      <span>Тихо</span>
+                      <span>Громко</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-[#36393f] rounded-lg">
+                    <div className="flex items-center gap-3">
+                      {micMuted ? <MicOff className="w-5 h-5 text-red-400" /> : <Mic className="w-5 h-5 text-[#3ba55c]" />}
+                      <div>
+                        <div className="text-white text-sm font-medium">Микрофон</div>
+                        <div className="text-[#b9bbbe] text-xs">{micMuted ? "Выключен" : "Включён"}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setMicMuted(!micMuted)}
+                      className={`w-12 h-6 rounded-full transition-colors relative ${micMuted ? "bg-red-500" : "bg-[#3ba55c]"}`}
+                    >
+                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${micMuted ? "left-1" : "left-7"}`} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {settingsTab === "avatar" && (
+                <div className="space-y-4">
+                  <label className="text-[#b9bbbe] text-xs font-semibold uppercase tracking-wide block">Цвет аватарки</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {AVATAR_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setAvatarColor(color)}
+                        className={`h-16 rounded-xl bg-gradient-to-r ${color} flex items-center justify-center relative border-2 transition-all ${
+                          avatarColor === color ? "border-white scale-105" : "border-transparent"
+                        }`}
+                      >
+                        <span className="text-white text-xl font-bold">{avatarLetter || "С"}</span>
+                        {avatarColor === color && (
+                          <div className="absolute top-1 right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-[#5865f2]" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 pb-5 flex justify-end gap-3">
+              <Button variant="ghost" className="text-[#b9bbbe] hover:text-white hover:bg-[#40444b]" onClick={() => setSettingsOpen(false)}>
+                Отмена
+              </Button>
+              <Button className="bg-[#5865f2] hover:bg-[#4752c4] text-white" onClick={handleSaveSettings}>
+                Сохранить
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модаль управления участниками */}
+      {usersOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setUsersOpen(false)}>
+          <div className="bg-[#2f3136] rounded-xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[#202225]">
+              <h2 className="text-white text-lg font-bold">Участники</h2>
+              <Button variant="ghost" size="sm" className="w-8 h-8 p-0 hover:bg-[#40444b]" onClick={() => setUsersOpen(false)}>
+                <X className="w-4 h-4 text-[#b9bbbe]" />
+              </Button>
+            </div>
+            <div className="p-4 space-y-2">
+              {users.map((user, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-[#36393f] rounded-lg">
+                  <div className={`w-10 h-10 bg-gradient-to-r ${user.color} rounded-full flex items-center justify-center relative flex-shrink-0`}>
+                    <span className="text-white text-sm font-bold">{user.avatar}</span>
+                    {user.isAdmin && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#faa61a] rounded-full flex items-center justify-center">
+                        <Crown className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-white text-sm font-medium truncate">{user.name}</span>
+                      {user.isAdmin && (
+                        <span className="bg-[#faa61a] text-black text-xs px-1.5 py-0.5 rounded font-semibold flex-shrink-0">Админ</span>
+                      )}
+                    </div>
+                    <div className="text-[#b9bbbe] text-xs truncate">{user.status}</div>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => toggleAdmin(index)}
+                    className={`text-xs px-3 flex-shrink-0 ${
+                      user.isAdmin
+                        ? "bg-[#40444b] hover:bg-red-500/20 text-[#b9bbbe] hover:text-red-400 border border-[#40444b]"
+                        : "bg-[#faa61a]/10 hover:bg-[#faa61a]/20 text-[#faa61a] border border-[#faa61a]/30"
+                    }`}
+                  >
+                    {user.isAdmin ? "Снять права" : "Сделать админом"}
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="px-6 pb-5 text-[#8e9297] text-xs text-center">
+              Администраторы видят все каналы и могут управлять участниками
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Уведомление о сохранении */}
+      {savedNotice && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#3ba55c] text-white px-5 py-2.5 rounded-lg shadow-xl z-50 flex items-center gap-2 text-sm font-medium">
+          <Check className="w-4 h-4" /> Настройки сохранены!
+        </div>
+      )}
     </div>
   );
 };
